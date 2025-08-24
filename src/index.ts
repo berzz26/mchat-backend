@@ -40,17 +40,16 @@ app.use(
   cors({
     origin: "*", // allow all origins
     credentials: false, // can't use credentials with '*'
-  })
+  }),
 );
 
-app.use(express.json())
+app.use(express.json());
 
-app.get('/health', (req: Request, res: Response) => {
-  res.send("mchat-api server running")
-})
+app.get("/health", (req: Request, res: Response) => {
+  res.send("mchat-api server running");
+});
 
-app.use('/api', routes)
-
+app.use("/api", routes);
 
 const PORT = process.env.PORT || 3000;
 if (!PORT) {
@@ -59,4 +58,3 @@ if (!PORT) {
 app.listen(PORT, () => {
   console.log(`Backend is up`);
 });
-
