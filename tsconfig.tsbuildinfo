@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/socket.ts","./src/types.ts","./src/utils.ts","./src/config/db.ts","./src/config/redis.ts","./src/middlewares/validator.ts","./src/routes/room.route.ts"],"version":"5.9.2"}
+{"root":["./src/index.ts","./src/socket.ts","./src/test.ts","./src/types.ts","./src/utils.ts","./src/config/db.ts","./src/config/redis.ts","./src/middlewares/validator.ts","./src/routes/room.route.ts"],"version":"5.9.2"}

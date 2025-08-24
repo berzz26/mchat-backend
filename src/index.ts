@@ -2,39 +2,9 @@ import express, { type Request, type Response } from "express";
 import { Server } from "socket.io";
 import routes from "./routes/room.route.js";
 import cors from "cors";
+import { initSocket } from "./socket.js";
 
 const app = express();
-
-// const server = app.listen(8080, () => {
-//   console.log(new Date(), "server listening on 8080");
-// });
-
-// app.get("/", (req, res) => {
-//   res.send("hey world");
-// });
-
-// const io = new Server(server);
-
-// let users = 0;
-
-// io.on("connection", (socket) => {
-//   console.log(`user connected ${++users}`);
-
-//   // send message on connection
-//   socket.emit("message", "Hello from Socket.IO server!!");
-
-//   // listen for custom event
-//   socket.on("message", (data) => {
-//     console.log("received:", data);
-
-//     // echo back to client
-//     socket.emit("message", `server got: ${data}`);
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log(`user disconnected ${--users}`);
-//   });
-// });
 
 app.use(
   cors({
@@ -55,6 +25,8 @@ const PORT = process.env.PORT || 3000;
 if (!PORT) {
   throw new Error("Port in env not defined");
 }
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Backend is up`);
 });
+
+initSocket(server);
