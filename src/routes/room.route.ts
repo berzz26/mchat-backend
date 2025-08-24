@@ -20,12 +20,10 @@ router.post("/create-user", async (req: Request, res: Response) => {
     res.status(201).json({ success: true, message: newUser });
   } catch (error) {
     console.error(error);
-    res
-      .status(401)
-      .json({
-        success: false,
-        message: "something went wrong in userController",
-      });
+    res.status(401).json({
+      success: false,
+      message: "something went wrong in userController",
+    });
   }
 });
 
@@ -46,11 +44,40 @@ router.post("/create-room", async (req: Request, res: Response) => {
     res.status(201).json({ success: true, message: room });
   } catch (error) {
     console.error(error);
-    res
+    res.status(401).json({
+      success: false,
+      message: "something went wrong in roomController",
+    });
+  }
+});
+
+router.post("/join-room/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id) {
+    return res
       .status(401)
-      .json({
-        success: false,
-        message: "something went wrong in roomController",
-      });
+      .json({ success: false, message: "Room ID not provided in params" });
+  }
+  try {
+    const room = await prisma.room.findUniqueOrThrow({ where: { id } });
+    if (!room) return res.status(404).json({ error: "room not found" });
+
+    // implement userCount check here. fetch the current number of users in that room from redis, if currUser>=maxUsers, then no entry
+
+    const limit = Math.min(Number(req.body.limit ?? 50), 200);
+    const messages = await prisma.message.findMany({
+      where: { roomId: id },
+      orderBy: { sentAt: "desc" },
+      take: limit,
+    });
+    res.json({
+      success: true,
+      message: { room, messages: messages.reverse() },
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ success: false, message: "somehting went wrong at joinRoom" });
   }
 });
