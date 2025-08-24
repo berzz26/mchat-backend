@@ -4,7 +4,7 @@ export const prisma = new PrismaClient();
 // const addUser = async () => {
 //     await prisma.user.create({
 //         data: {
-//             username: "testUser"
+//             username: "testUser2"
 //         }
 //     })
 // }
