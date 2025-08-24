@@ -30,12 +30,10 @@ router.post("/create-user", async (req: Request, res: Response) => {
 router.post("/create-room", async (req: Request, res: Response) => {
   const { userId, maxUsers, name } = req.body;
   if (!userId || !name) {
-    return res
-      .status(401)
-      .json({
-        success: false,
-        message: "UserId or RoomName  not provided with body",
-      });
+    return res.status(401).json({
+      success: false,
+      message: "UserId or RoomName  not provided with body",
+    });
   }
   try {
     const room = await prisma.room.create({
