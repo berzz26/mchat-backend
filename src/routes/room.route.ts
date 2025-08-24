@@ -18,6 +18,39 @@ router.post("/create-user", async (req: Request, res: Response) => {
       },
     });
     res.status(201).json({ success: true, message: newUser });
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+    res
+      .status(401)
+      .json({
+        success: false,
+        message: "something went wrong in userController",
+      });
+  }
 });
-router.post("/create-room", async (req, res) => {});
+
+router.post("/create-room", async (req: Request, res: Response) => {
+  const { userId, maxUsers } = req.body;
+  if (!userId) {
+    return res
+      .status(401)
+      .json({ success: false, message: "UserId not provided with body" });
+  }
+  try {
+    const room = await prisma.room.create({
+      data: {
+        userId,
+        ...(maxUsers ? { maxUsers } : {}), //only add if provided
+      },
+    });
+    res.status(201).json({ success: true, message: room });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(401)
+      .json({
+        success: false,
+        message: "something went wrong in roomController",
+      });
+  }
+});
