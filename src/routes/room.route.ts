@@ -11,7 +11,15 @@ router.post("/create-user", async (req: Request, res: Response) => {
             .status(401)
             .json({ success: false, message: "username required" });
     }
+    const user = await prisma.user.findFirst({ where: { username } })
+
+    if (user) {
+        return res.status(401).json({ success: false, message: "user with username already exists" })
+    }
+
     try {
+
+
         const newUser = await prisma.user.create({
             data: {
                 username,

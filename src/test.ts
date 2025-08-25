@@ -6,7 +6,7 @@ socket.emit("client", {
   type: "send_message",
   roomId: "cmeps9h2a000196tl9kwi1ykx",
   userId: "3ed6cbb7-4c48-4fc7-88aa-33446fbc81ab",
-  text: "hello world",
+  text: "what da faq",
 });
 
 socket.on("server", (msg) => {
