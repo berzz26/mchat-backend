@@ -62,4 +62,16 @@ router.post("/join-room/:id", async (req: Request, res: Response) => {
   }
 });
 
+router.get("/get-rooms", async (req: Request, res: Response) => {
+  try {
+    const rooms = await prisma.room.findMany();
+    res.status(200).json({ success: true, message: rooms });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ sucess: false, message: "Fetch Rooms error" });
+  }
+});
+
 export default router;
