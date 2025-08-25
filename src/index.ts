@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from "express";
 import { Server } from "socket.io";
-import routes from "./routes/room.route.js";
+import routes from "./routes/index.js";
 import cors from "cors";
 import { initSocket } from "./socket.js";
 
