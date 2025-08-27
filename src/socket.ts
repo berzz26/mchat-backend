@@ -38,7 +38,7 @@ export const initSocket = (httpServer: HttpServer) => {
           include: { User: true },
         });
 
-        console.log(saved);
+        // console.log(saved);
 
         socket.to(msg.roomId).emit("server", {
           type: "new_message",

@@ -74,6 +74,21 @@ router.get("/get-rooms", async (req: Request, res: Response) => {
     }
 });
 
+router.get("/get-message", async (req: Request, res: Response) => {
+    const { roomId } = req.body
+    try {
+        const messages = await prisma.message.findMany({ where: { roomId } })
+        res.status(200).json({ success: true, message: messages })
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .json({ sucess: false, message: "Fetch messages error" });
+
+
+    }
+})
+
 // TODO get route by id 
 
 export default router;
