@@ -2,38 +2,45 @@ import { Server } from "socket.io";
 import type { Server as HttpServer } from "http";
 import { prisma } from "./config/db.js";
 import type { WsIncoming } from "./types.js";
+import { Socket } from "socket.io";
+
+interface CustomSocket extends Socket {
+  data: {
+    roomId?: string;
+    userId?: string;
+  };
+}
 
 export const initSocket = (httpServer: HttpServer) => {
   const io = new Server(httpServer, {
     cors: { origin: '*', credentials: false },
   });
 
-  io.on("connection", (socket) => {
-    let roomId = "";
-    let userId = "";
-    console.log("user connected :", socket.id);
+  io.on("connection", (socket: CustomSocket) => {
+    // Access userId and roomId directly from the query
+    const { userId, roomId } = socket.handshake.query;
+
+    if (typeof userId === 'string' && typeof roomId === 'string') {
+      socket.data.userId = userId;
+      socket.data.roomId = roomId;
+
+      socket.join(roomId);
+      io.to(roomId).emit("server", { type: "user_joined", userId });
+      console.log(`User ${userId} joined room ${roomId}`);
+    }
 
     socket.on("client", async (msg: WsIncoming) => {
       console.log(msg);
-      if (msg.type === "join_room") {
-        roomId = msg.roomId;
-        userId = msg.userId;
-        const key = `room:${roomId}:users`;
-
-        socket.join(roomId);
-        io.to(roomId).emit("server", { type: "user_joined", userId });
-
-        return;
-      }
 
       if (msg.type === "send_message") {
         const saved = await prisma.message.create({
           data: { roomId: msg.roomId, userId: msg.userId, text: msg.text },
           include: { User: true },
         });
+
         console.log(saved);
 
-        io.to(msg.roomId).emit("server", {
+        socket.to(msg.roomId).emit("server", {
           type: "new_message",
           id: saved.id,
           roomId: saved.roomId,
@@ -46,7 +53,8 @@ export const initSocket = (httpServer: HttpServer) => {
       }
 
       if (msg.type === "typing") {
-        io.to(msg.roomId).emit("server", {
+        // Use socket.to.emit to exclude the sender
+        socket.to(msg.roomId).emit("server", {
           type: "typing",
           userId: msg.userId,
           isTyping: msg.isTyping,
@@ -55,8 +63,11 @@ export const initSocket = (httpServer: HttpServer) => {
     });
 
     socket.on("disconnect", async () => {
+      const { userId, roomId } = socket.data;
+
       if (roomId && userId) {
-        const key = `room:${roomId}:users`;
+        console.log(`User ${userId} left room ${roomId}`);
+        // Broadcast to all clients in the room except the one who disconnected
         socket.to(roomId).emit("server", { type: "user_left", userId });
       }
     });
