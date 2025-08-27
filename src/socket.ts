@@ -13,14 +13,14 @@ interface CustomSocket extends Socket {
 
 export const initSocket = (httpServer: HttpServer) => {
   const io = new Server(httpServer, {
-    cors: { origin: '*', credentials: false },
+    cors: { origin: "*", credentials: false },
   });
 
   io.on("connection", (socket: CustomSocket) => {
     // Access userId and roomId directly from the query
     const { userId, roomId } = socket.handshake.query;
 
-    if (typeof userId === 'string' && typeof roomId === 'string') {
+    if (typeof userId === "string" && typeof roomId === "string") {
       socket.data.userId = userId;
       socket.data.roomId = roomId;
 
