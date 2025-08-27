@@ -5,13 +5,13 @@ import type { WsIncoming } from "./types.js";
 
 export const initSocket = (httpServer: HttpServer) => {
   const io = new Server(httpServer, {
-    cors: { origin: process.env.WEB_ORIGIN, credentials: true },
+    cors: { origin: '*', credentials: false },
   });
 
   io.on("connection", (socket) => {
     let roomId = "";
     let userId = "";
-    console.log("user connected");
+    console.log("user connected :", socket.id);
 
     socket.on("client", async (msg: WsIncoming) => {
       console.log(msg);

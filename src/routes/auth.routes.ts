@@ -1,6 +1,8 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
 import { prisma } from "../config/db.js";
+//auth is not proper, without password. its okay as i dont want user to create a account to chat, they should be able
+// to just enter the username, the roomId and chat. okay to not have particualre user profiles. 
 
 const router = Router();
 
@@ -46,7 +48,7 @@ router.post("/login", async (req: Request, res: Response) => {
     if (!user) {
       return res
         .status(404)
-        .json({ success: false, message: "User deos not exists" });
+        .json({ success: false, message: "User does not exists" });
     }
 
     res.status(202).json({ success: true, message: user });
