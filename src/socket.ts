@@ -4,6 +4,10 @@ import { prisma } from "./config/db.js";
 import type { WsIncoming } from "./types.js";
 import { Socket } from "socket.io";
 
+//TODO: implement redis socketIo adapter to scale mutliple instances of this server 
+//App cache to store data in mem and send batch queries to reduce db calls 
+
+
 interface CustomSocket extends Socket {
   data: {
     roomId?: string;
@@ -30,7 +34,7 @@ export const initSocket = (httpServer: HttpServer) => {
     }
 
     socket.on("client", async (msg: WsIncoming) => {
-      console.log(msg);
+      // console.log(msg);
 
       if (msg.type === "send_message") {
         const saved = await prisma.message.create({

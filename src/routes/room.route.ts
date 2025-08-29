@@ -74,10 +74,12 @@ router.get("/get-rooms", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/get-message", async (req: Request, res: Response) => {
-  const { roomId } = req.body;
+router.get("/get-message/:roomId", async (req: Request, res: Response) => {
+  const { roomId } = req.params;
+  if (!roomId)
+    return res.status(401).json({ success: false, message: 'room id not provided' })
   try {
-    const messages = await prisma.message.findMany({ where: { roomId } });
+    const messages = await prisma.message.findMany({ where: { roomId }, include: { User: true } });
     res.status(200).json({ success: true, message: messages });
   } catch (error) {
     console.error(error);
