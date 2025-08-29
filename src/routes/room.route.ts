@@ -5,7 +5,7 @@ import type { Request, Response } from "express";
 const router = Router();
 
 router.post("/create-room", async (req: Request, res: Response) => {
-  const { userId, maxUsers, name } = req.body;
+  const { userId, maxUsers, name, isPublic } = req.body;
   if (!userId || !name) {
     return res.status(401).json({
       success: false,
@@ -13,12 +13,21 @@ router.post("/create-room", async (req: Request, res: Response) => {
     });
   }
   try {
+    const roomData: any = {
+      userId,
+      name,
+    };
+
+    if (maxUsers) {
+      roomData.maxUsers = maxUsers;
+    }
+
+    if (isPublic != null) {
+      roomData.isPublic = isPublic;
+    }
+
     const room = await prisma.room.create({
-      data: {
-        userId,
-        name,
-        ...(maxUsers ? { maxUsers } : {}), //only add if provided
-      },
+      data: roomData,
     });
     res.status(201).json({ success: true, message: room });
   } catch (error) {
@@ -62,10 +71,23 @@ router.post("/join-room/:id", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/get-rooms", async (req: Request, res: Response) => {
+router.get("/get-rooms/:userId", async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  if (!userId)
+    return res.status(401).json({ success: false, message: "User id not provided" })
   try {
-    const rooms = await prisma.room.findMany();
-    res.status(200).json({ success: true, message: rooms });
+    const generalRooms = await prisma.room.findMany({ where: { isPublic: true } });
+    const userRooms = await prisma.room.findMany({ where: { userId } })
+
+    const roomData: any = {
+      generalRooms,
+      userRooms
+
+    }
+    if (userRooms) {
+      roomData.userRooms = userRooms
+    }
+    res.status(200).json({ success: true, message: roomData });
   } catch (error) {
     console.error(error);
     return res
@@ -73,6 +95,7 @@ router.get("/get-rooms", async (req: Request, res: Response) => {
       .json({ sucess: false, message: "Fetch Rooms error" });
   }
 });
+
 
 router.get("/get-message/:roomId", async (req: Request, res: Response) => {
   const { roomId } = req.params;

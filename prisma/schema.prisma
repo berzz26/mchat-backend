@@ -11,8 +11,8 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  username  String
+  id       String @id @default(uuid())
+  username String
 
   createdAt DateTime @default(now())
 
@@ -21,14 +21,14 @@ model User {
 }
 
 model Room {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String // createdBy → FK to User
   name      String
-  maxUsers  Int      @default(10)
-  createdAt DateTime @default(now())
-
-  messages Message[]
-  creator  User      @relation(fields: [userId], references: [id])
+  maxUsers  Int       @default(10)
+  createdAt DateTime  @default(now())
+  isPublic  Boolean   @default(true)
+  messages  Message[]
+  creator   User      @relation(fields: [userId], references: [id])
 }
 
 model Message {
