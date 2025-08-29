@@ -76,8 +76,28 @@ router.get("/get-rooms/:userId", async (req: Request, res: Response) => {
   if (!userId)
     return res.status(401).json({ success: false, message: "User id not provided" })
   try {
-    const generalRooms = await prisma.room.findMany({ where: { isPublic: true } });
-    const userRooms = await prisma.room.findMany({ where: { userId } })
+    const allRooms = await prisma.room.findMany({
+      select: {
+        id: true,
+        name: true,
+        maxUsers: true,
+        createdAt: true,
+        isPublic: true,
+        userId: true,
+        creator: {
+          select: {
+            username: true, // only username from creator
+          },
+        },
+      },
+    });
+    const generalRooms = allRooms
+      .filter((room) => room.isPublic === true)
+      .map(({ userId, ...rest }) => rest); // strip userId
+
+    const userRooms = allRooms
+      .filter((room) => room.userId === userId)
+      .map(({ userId, ...rest }) => rest); // strip userId
 
     const roomData: any = {
       generalRooms,
