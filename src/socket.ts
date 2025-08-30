@@ -23,7 +23,7 @@ export const initSocket = (httpServer: HttpServer) => {
   io.on("connection", (socket: CustomSocket) => {
     // Access userId and roomId directly from the query
     const { userId, roomId } = socket.handshake.query;
-
+    let userCount = 0
     if (typeof userId === "string" && typeof roomId === "string") {
       socket.data.userId = userId;
       socket.data.roomId = roomId;
@@ -31,6 +31,7 @@ export const initSocket = (httpServer: HttpServer) => {
       socket.join(roomId);
       io.to(roomId).emit("server", { type: "user_joined", userId });
       console.log(`User ${userId} joined room ${roomId}`);
+      userCount++;
     }
 
     socket.on("client", async (msg: WsIncoming) => {
@@ -52,6 +53,7 @@ export const initSocket = (httpServer: HttpServer) => {
           name: saved.User.username,
           text: saved.text,
           sentAt: saved.sentAt.toISOString(),
+          userCount
         });
         return;
       }
@@ -71,6 +73,7 @@ export const initSocket = (httpServer: HttpServer) => {
 
       if (roomId && userId) {
         console.log(`User ${userId} left room ${roomId}`);
+        userCount--;
         // Broadcast to all clients in the room except the one who disconnected
         socket.to(roomId).emit("server", { type: "user_left", userId });
       }
