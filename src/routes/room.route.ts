@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { prisma } from "../config/db.js";
 import type { Request, Response } from "express";
-
+import { createRoomLimiter, joinRoomLimiter, getRoomLimiter, getChatLimiter } from "../middlewares/rateLimitter.js";
 const router = Router();
 
-router.post("/create-room", async (req: Request, res: Response) => {
+router.post("/create-room", createRoomLimiter, async (req: Request, res: Response) => {
   const { userId, maxUsers, name, isPublic } = req.body;
   if (!userId || !name) {
     return res.status(401).json({
@@ -39,7 +39,7 @@ router.post("/create-room", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/join-room/:id", async (req: Request, res: Response) => {
+router.post("/join-room/:id", joinRoomLimiter, async (req: Request, res: Response) => {
   const { id } = req.params;
   if (!id) {
     return res
@@ -52,6 +52,8 @@ router.post("/join-room/:id", async (req: Request, res: Response) => {
     //TODOS
     // implement userCount check here. fetch the current number of users in that room from redis, if currUser>=maxUsers, then no entry
     // add user to redis set so that the num of user in redis for a particular room is updated
+
+
     const limit = Math.min(Number(req.body.limit ?? 50), 200);
     const messages = await prisma.message.findMany({
       where: { roomId: id },
@@ -71,7 +73,7 @@ router.post("/join-room/:id", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/get-rooms/:userId", async (req: Request, res: Response) => {
+router.get("/get-rooms/:userId", getRoomLimiter, async (req: Request, res: Response) => {
   const { userId } = req.params;
   if (!userId)
     return res.status(401).json({ success: false, message: "User id not provided" })
@@ -117,7 +119,7 @@ router.get("/get-rooms/:userId", async (req: Request, res: Response) => {
 });
 
 
-router.get("/get-message/:roomId", async (req: Request, res: Response) => {
+router.get("/get-message/:roomId", getChatLimiter, async (req: Request, res: Response) => {
   const { roomId } = req.params;
   if (!roomId)
     return res.status(401).json({ success: false, message: 'room id not provided' })

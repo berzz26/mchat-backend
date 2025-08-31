@@ -1,6 +1,7 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
 import { prisma } from "../config/db.js";
+
 //auth is not proper, without password. its okay as i dont want user to create a account to chat, they should be able
 // to just enter the username, the roomId and chat. okay to not have particualre user profiles.
 

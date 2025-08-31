@@ -5,6 +5,8 @@ import cors from "cors";
 import { initSocket } from "./socket.js";
 import redis from "./config/redis.js"; // <-- import redis client
 import { prisma } from "./config/db.js"
+import { globalLimiter } from "./middlewares/rateLimitter.js";
+
 const app = express();
 
 app.use(
@@ -20,6 +22,9 @@ app.get("/health", (req: Request, res: Response) => {
   res.send("mchat-api server running");
 });
 
+//mount the global rate limiter
+app.use(globalLimiter)
+//mount the api routes
 app.use("/api", routes);
 
 const PORT = process.env.PORT || 3000;
