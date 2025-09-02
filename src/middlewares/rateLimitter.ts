@@ -33,7 +33,7 @@ export const joinRoomLimiter = rateLimit({
 });
 
 export const getRoomLimiter = rateLimit({
-    windowMs: 3 * 60 * 1000, // 5 min
+    windowMs: 3 * 60 * 1000, // 3 min
     limit: 10,               // per IP
     standardHeaders: true,
     legacyHeaders: false,
