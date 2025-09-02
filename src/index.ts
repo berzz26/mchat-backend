@@ -1,4 +1,5 @@
 import express, { type Request, type Response } from "express";
+import dotenv from "dotenv";
 import { Server } from "socket.io";
 import routes from "./routes/index.js";
 import cors from "cors";
@@ -7,7 +8,9 @@ import redis from "./config/redis.js"; // <-- import redis client
 import { prisma } from "./config/db.js"
 import { globalLimiter } from "./middlewares/rateLimitter.js";
 
+
 const app = express();
+dotenv.config();
 
 app.use(
   cors({
