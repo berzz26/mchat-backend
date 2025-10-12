@@ -18,13 +18,13 @@ interface CustomSocket extends Socket {
   };
 }
 
+export const pubClient = createClient({
+  url: process.env.UPSTASH_REDIS_URL!,
+
+});
 export const initSocket = async (httpServer: HttpServer) => {
 
   //create seperate redis clients for adapters
-  const pubClient = createClient({
-    url: process.env.UPSTASH_REDIS_URL!,
-    
-  });
   const subClient = pubClient.duplicate();
 
   await Promise.all([pubClient.connect(), subClient.connect()]);

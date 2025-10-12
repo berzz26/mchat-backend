@@ -2,6 +2,7 @@ import { Router } from "express";
 import { prisma } from "../config/db.js";
 import type { Request, Response } from "express";
 import { createRoomLimiter, joinRoomLimiter, getRoomLimiter, getChatLimiter } from "../middlewares/rateLimitter.js";
+import { pubClient } from "../socket.js";
 const router = Router();
 
 router.post("/create-room", createRoomLimiter, async (req: Request, res: Response) => {
@@ -49,11 +50,15 @@ router.post("/join-room/:id", joinRoomLimiter, async (req: Request, res: Respons
   try {
     const room = await prisma.room.findUniqueOrThrow({ where: { id } });
 
-    //TODOS
-    // implement userCount check here. fetch the current number of users in that room from redis, if currUser>=maxUsers, then no entry
-    // add user to redis set so that the num of user in redis for a particular room is updated
+    //check for max users
+    const currentUserCount = await pubClient.sCard(`room:${room.id}:users`);
+    const maxUserCount = room.maxUsers
 
+    if (currentUserCount >= maxUserCount) {
+      return res.status(409).json({ success: false, message: `The room is at its max user capacity: ${currentUserCount}` })
+    }
 
+    //message limit for not overwhelming the query with all the messages. max is 200 and default is 50
     const limit = Math.min(Number(req.body.limit ?? 50), 200);
     const messages = await prisma.message.findMany({
       where: { roomId: id },
