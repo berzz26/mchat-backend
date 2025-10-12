@@ -20,6 +20,8 @@ app.use(
 );
 
 app.use(express.json());
+app.set('trust proxy', 1);
+
 
 app.get("/health", (req: Request, res: Response) => {
   res.send("mchat-api server running");
@@ -27,6 +29,7 @@ app.get("/health", (req: Request, res: Response) => {
 
 //mount the global rate limiter
 app.use(globalLimiter)
+
 //mount the api routes
 app.use("/api", routes);
 
