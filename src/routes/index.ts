@@ -1,4 +1,3 @@
-import { appendFile } from "fs";
 import authRoutes from "./auth.routes.js";
 import roomRoutes from "./room.route.js";
 import { Router } from "express";

@@ -23,6 +23,7 @@ export const initSocket = async (httpServer: HttpServer) => {
   //create seperate redis clients for adapters
   const pubClient = createClient({
     url: process.env.UPSTASH_REDIS_URL!,
+    
   });
   const subClient = pubClient.duplicate();
 

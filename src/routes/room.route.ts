@@ -135,5 +135,21 @@ router.get("/get-message/:roomId", getChatLimiter, async (req: Request, res: Res
 });
 
 // TODO get route by id
+//TODO implement route to delete user room, clear cache and soft delete from db
+router.delete('/delete-room', async (req: Request, res: Response) => {
+  const { id } = req.body;
+  if (!id) {
+    return res.status(401).json({ succeess: false, message: "Room id not provided" })
+  }
+  try {
+    await prisma.room.delete({ where: { id } });
+    return res.status(200).json({ success: true, message: "Room deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ sucess: false, message: "Fetch messages error" });
+  }
+})
 
 export default router;
